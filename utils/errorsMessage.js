@@ -1,6 +1,4 @@
-const BAD_REQUEST = 400;
-const NOT_FOUND = 404;
-const INTERNAL_SERVER_ERROR = 500;
+const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = require('./errorsStatus');
 
 const errorMessage = (err, req, res) => {
   if (err.name === 'CastError') {
@@ -20,5 +18,3 @@ const errorMessage = (err, req, res) => {
 };
 
 module.exports = { errorMessage };
-
-// module.exports = { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR };

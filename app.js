@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+const { userRoutes } = require('./routes/userRoutes');
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -14,6 +16,8 @@ app.use(express.json());
 // app.post("/", (req, res) => {
 //   res.send(req.body);
 // });
+
+app.use('/users', userRoutes);
 
 async function main() {
   await mongoose.connect('mongodb://localhost:27017/mestodb');

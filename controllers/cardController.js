@@ -1,22 +1,24 @@
 const Card = require('../models/cardModels');
+const { errorMessage } = require('../utils/errors');
 
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => console.log(err, req, res));
+    .catch((err) => errorMessage(err, req, res));
 };
 
 const addCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
-    .catch((err) => console.log(err, req, res));
+    .catch((err) => errorMessage(err, req, res));
 };
 
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail()
     .then((card) => res.send({ data: card }))
-    .catch((err) => console.log(err, req, res));
+    .catch((err) => errorMessage(err, req, res));
 };
 
 const addLike = (req, res) => {
@@ -25,8 +27,9 @@ const addLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail()
     .then((card) => res.send({ data: card }))
-    .catch((err) => console.log(err, req, res));
+    .catch((err) => errorMessage(err, req, res));
 };
 
 const deleteLike = (req, res) => {
@@ -35,8 +38,9 @@ const deleteLike = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail()
     .then((card) => res.send({ data: card }))
-    .catch((err) => console.log(err, req, res));
+    .catch((err) => errorMessage(err, req, res));
 };
 
 module.exports = {

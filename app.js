@@ -9,13 +9,13 @@ const app = express();
 
 app.use(express.json());
 
-// app.get("/", (req, res) => {
-//   res.send({ foo: "Hello" });
-// });
+app.use((req, res, next) => {
+  req.user = {
+    _id: '6307ed7eff06ba9a2cc61ac0',
+  };
 
-// app.post("/", (req, res) => {
-//   res.send(req.body);
-// });
+  next();
+});
 
 app.use('/users', userRoutes);
 

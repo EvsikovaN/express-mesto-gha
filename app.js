@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 
 const { PORT = 3000 } = process.env;
 
@@ -14,6 +15,12 @@ app.use(express.json());
 //   res.send(req.body);
 // });
 
-app.listen(PORT, () => {
+async function main() {
+  await mongoose.connect('mongodb://localhost:27017/mestodb');
+  console.log('Connected to db');
+
+  await app.listen(PORT);
   console.log(`Server listen on ${PORT}`);
-});
+}
+
+main();

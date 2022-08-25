@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const { userRoutes } = require('./routes/userRoutes');
 const { cardRoutes } = require('./routes/cardRoutes');
 
+const { NOT_FOUND } = require('./utils/errors');
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -20,6 +22,10 @@ app.use((req, res, next) => {
 
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
+
+app.use((req, res) => {
+  res.status(NOT_FOUND).send({ message: 'Страница не найдена' });
+});
 
 async function main() {
   await mongoose.connect('mongodb://localhost:27017/mestodb');

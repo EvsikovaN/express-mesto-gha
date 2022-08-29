@@ -15,10 +15,14 @@ const addCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail()
-    .then((card) => res.send({ data: card }))
-    .catch((err) => errorMessage(err, req, res));
+  if (req.params.cardId === req.user._id) {
+    Card.findByIdAndRemove(req.params.cardId)
+      .orFail()
+      .then((card) => res.send({ data: card }))
+      .catch((err) => errorMessage(err, req, res));
+  } else {
+    res.status(401).send({ message: 'Вы не можете удалять карточки других пользователей' });
+  }
 };
 
 const addLike = (req, res) => {

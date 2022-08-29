@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/userModels');
 const { errorMessage } = require('../utils/errorsMessage');
 
@@ -61,10 +62,35 @@ const updateAvatar = (req, res) => {
     .catch((err) => errorMessage(err, req, res));
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      // аутентификация успешна! пользователь в переменной user
+      // создадим токен
+      // передали два аргумента: пейлоуд токена и секретный ключ подписи:
+      // Пейлоуд токена — зашифрованный в строку объект пользователя
+      // время, в течение которого токен остаётся действительным
+      // Можно передать число, тогда метод sign сочтёт его за количество секунд:
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+
+      // вернём токен
+      res.send({ token });
+    })
+    .catch((err) => {
+      // ошибка аутентификации
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
   updateProfileInfo,
   updateAvatar,
+  login,
 };

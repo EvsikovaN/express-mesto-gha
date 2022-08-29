@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    select: false,
+    select: false, // по умолчанию хеш пароля пользователя не будет возвращаться из базы
   },
 });
 

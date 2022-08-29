@@ -2,22 +2,25 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModels');
 const { errorMessage } = require('../utils/errorsMessage');
+const { NotFoundError } = require('../errors/not-found-err');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch((err) => errorMessage(err, req, res));
+    .then((users) => res.status(200).send(users))
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail()
+    .orFail(() => {
+      throw new NotFoundError('Нет пользователя с таким id');
+    })
     .then((user) => res.send({ data: user }))
-    .catch((err) => errorMessage(err, req, res));
+    .catch((err) => errorMessage(err, req, res, next));
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -35,34 +38,38 @@ const createUser = (req, res) => {
       password: hash,
     }))
     .then((user) => res.send(user))
-    .catch((err) => errorMessage(err, req, res));
+    .catch((err) => errorMessage(err, req, res, next));
 };
 
-const updateProfileInfo = (req, res) => {
+const updateProfileInfo = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
     { new: true, runValidators: true },
   )
-    .orFail()
+    .orFail(() => {
+      throw new NotFoundError('Пользователь с таким id не найден');
+    })
     .then((user) => res.send({ data: user }))
-    .catch((err) => errorMessage(err, req, res));
+    .catch((err) => errorMessage(err, req, res, next));
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
     { avatar },
     { new: true, runValidators: true },
   )
-    .orFail()
+    .orFail(() => {
+      throw new NotFoundError('Пользователь с таким id не найден');
+    })
     .then((user) => res.send({ data: user }))
-    .catch((err) => errorMessage(err, req, res));
+    .catch((err) => errorMessage(err, req, res, next));
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -78,20 +85,17 @@ const login = (req, res) => {
       // вернём токен
       res.send({ token });
     })
-    .catch((err) => {
-      // ошибка аутентификации
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
 
-const getUserInfo = (req, res) => {
+const getUserInfo = (req, res, next) => {
   const { _id } = req.user;
   User.findById(_id)
-    .orFail()
+    .orFail(() => {
+      throw new NotFoundError('Пользователь не найден');
+    })
     .then((user) => res.send({ data: user }))
-    .catch((err) => errorMessage(err, req, res));
+    .catch((err) => errorMessage(err, req, res, next));
 };
 
 module.exports = {

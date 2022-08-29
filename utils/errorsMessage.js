@@ -1,20 +1,14 @@
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = require('./errorsStatus');
+const { BadRequestError } = require('../errors/bad-request-err');
+const { ConflictError } = require('../errors/conflict-err');
 
-const errorMessage = (err, req, res) => {
-  if (err.name === 'CastError') {
-    res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
-    return;
+const errorMessage = (err, req, res, next) => {
+  if (err.name === 'CastError' || err.name === 'ValidationError') {
+    next(new BadRequestError('Переданы некорректные данные'));
   }
-  if (err.name === 'ValidationError') {
-    res.status(BAD_REQUEST).send({ message: err.message });
-    return;
+  if (err.code === 11000) {
+    next(new ConflictError('Пользователь с таким email уже существует'));
   }
-  if (err.name === 'DocumentNotFoundError') {
-    res.status(NOT_FOUND).send({ message: 'Запрашиваемая карточка или пользователь не найден' });
-    return;
-  }
-
-  res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+  next(err);
 };
 
 module.exports = { errorMessage };

@@ -37,6 +37,7 @@ const createUser = (req, res, next) => {
       email,
       password: hash,
     }))
+    .then((user) => User.findOne({ _id: user._id }))
     .then((user) => res.send(user))
     .catch((err) => errorMessage(err, req, res, next));
 };

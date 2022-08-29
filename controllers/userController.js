@@ -86,6 +86,14 @@ const login = (req, res) => {
     });
 };
 
+const getUserInfo = (req, res) => {
+  const { _id } = req.user;
+  User.findById(_id)
+    .orFail()
+    .then((user) => res.send({ data: user }))
+    .catch((err) => errorMessage(err, req, res));
+};
+
 module.exports = {
   getUsers,
   getUserById,
@@ -93,4 +101,5 @@ module.exports = {
   updateProfileInfo,
   updateAvatar,
   login,
+  getUserInfo,
 };

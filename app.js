@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
+const { validateUserData, validateAuth } = require('./utils/validation');
 const { auth } = require('./middlewares/auth');
 
 const { userRoutes } = require('./routes/userRoutes');
@@ -15,13 +17,24 @@ const app = express();
 
 app.use(express.json());
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post(
+  '/signin',
+  validateAuth,
+  login,
+);
+
+app.post(
+  '/signup',
+  validateUserData,
+  createUser,
+);
 
 app.use(auth);
 
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
+
+app.use(errors()); // обработчик ошибок celebrate
 
 app.use((req, res, next) => {
   next(new NotFoundError('Запрашиваемой страницы не существует'));

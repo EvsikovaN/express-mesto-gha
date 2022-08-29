@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const { userRoutes } = require('./routes/userRoutes');
 const { cardRoutes } = require('./routes/cardRoutes');
+const { createUser, login } = require('./controllers/userController');
 
 const { NOT_FOUND } = require('./utils/errorsStatus');
 
@@ -19,6 +20,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
